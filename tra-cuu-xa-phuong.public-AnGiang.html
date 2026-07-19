@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tra cứu đơn vị hành chính sau hợp nhất (Tỉnh An Giang)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F7F3EA;
+    --paper-deep:#EFE8D8;
+    --ink:#20261F;
+    --ink-soft:#5B6156;
+    --red:#9A2B25;
+    --red-deep:#7A2019;
+    --gold:#B08A3E;
+    --line:#D8CFB8;
+    --card:#FFFDF8;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Tahoma',sans-serif;
+    min-height:100vh;
+    padding:36px 20px 60px;
+  }
+  .wrap{max-width:880px;margin:0 auto;}
+
+  /* header */
+  .eyebrow{
+    font-family:'Tahoma',monospace;
+    font-size:11px;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    color:var(--red-deep);
+    display:flex;align-items:center;gap:10px;
+    margin-bottom:14px;
+  }
+  .eyebrow::before{
+    content:"";
+    width:8px;height:8px;border-radius:50%;
+    background:var(--red);
+    display:inline-block;
+  }
+  h1{
+    font-family:'Tahoma',serif;
+    font-weight:700;
+    font-size:clamp(28px,5vw,42px);
+    line-height:1.1;
+    margin:0 0 10px;
+    letter-spacing:-.01em;
+  }
+  .sub{
+    color:var(--ink-soft);
+    font-size:15px;
+    line-height:1.6;
+    max-width:60ch;
+    margin:0 0 28px;
+  }
+  .sub b{color:var(--ink);}
+
+  /* tabs */
+  .tabs{
+    display:flex;
+    background:var(--paper-deep);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:4px;
+    gap:4px;
+    margin-bottom:18px;
+  }
+  .tab{
+    flex:1;
+    text-align:center;
+    padding:11px 10px;
+    font-weight:600;
+    font-size:14px;
+    border-radius:9px;
+    cursor:pointer;
+    color:var(--ink-soft);
+    transition:all .15s ease;
+    user-select:none;
+  }
+  .tab.active{
+    background:var(--card);
+    color:var(--red-deep);
+    box-shadow:0 1px 3px rgba(32,38,31,.12);
+  }
+  .tab .arrow{font-family:'Tahoma',monospace;opacity:.7;margin:0 4px;}
+
+  /* search box */
+  .search-shell{position:relative;margin-bottom:8px;}
+  .search-box{
+    width:100%;
+    padding:16px 48px 16px 18px;
+    font-size:17px;
+    font-family:'Tahoma',sans-serif;
+    border:1.5px solid var(--line);
+    border-radius:12px;
+    background:var(--card);
+    color:var(--ink);
+    outline:none;
+    transition:border-color .15s ease, box-shadow .15s ease;
+  }
+  .search-box:focus{
+    border-color:var(--red);
+    box-shadow:0 0 0 3px rgba(154,43,37,.12);
+  }
+  .search-box::placeholder{color:#A7A08C;}
+  .clear-btn{
+    position:absolute;right:14px;top:50%;transform:translateY(-50%);
+    width:26px;height:26px;border-radius:50%;
+    border:none;background:var(--paper-deep);color:var(--ink-soft);
+    cursor:pointer;font-size:14px;line-height:1;
+    display:none;align-items:center;justify-content:center;
+  }
+  .clear-btn.show{display:flex;}
+
+  .suggestions{
+    margin-top:6px;
+    border:1px solid var(--line);
+    border-radius:12px;
+    background:var(--card);
+    overflow:hidden;
+    display:none;
+  }
+  .suggestions.show{display:block;}
+  .sugg-item{
+    padding:11px 16px;
+    font-size:14px;
+    cursor:pointer;
+    border-bottom:1px solid var(--paper-deep);
+    display:flex;justify-content:space-between;gap:10px;
+  }
+  .sugg-item:last-child{border-bottom:none;}
+  .sugg-item:hover, .sugg-item.hi{background:var(--paper-deep);}
+  .sugg-item .meta{color:var(--ink-soft);font-size:12px;white-space:nowrap;}
+
+  .hint{font-size:12.5px;color:var(--ink-soft);margin:10px 2px 26px;}
+
+  /* results */
+  #results{min-height:60px;}
+  .empty-state{
+    text-align:center;
+    padding:44px 20px;
+    color:var(--ink-soft);
+    font-size:14px;
+  }
+  .empty-state .glyph{
+    font-family:'Tahoma',serif;
+    font-size:20px;
+    color:var(--gold);
+    margin-bottom:10px;
+    display:block;
+  }
+
+  .result-card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:26px 26px 22px;
+    animation:rise .25s ease;
+  }
+  @keyframes rise{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+
+  .rc-label{
+    font-family:'Tahoma',monospace;
+    font-size:10.5px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    margin-bottom:6px;
+  }
+  .rc-old{
+    font-size:15px;color:var(--ink-soft);
+    text-decoration:line-through;
+    text-decoration-color:var(--line);
+    margin-bottom:4px;
+  }
+  .rc-new{
+    font-family:'Tahoma',serif;
+    font-weight:700;
+    font-size:24px;
+    color:var(--red-deep);
+    margin-bottom:16px;
+  }
+  .divider-arrow{
+    display:flex;align-items:center;gap:10px;
+    color:var(--gold);margin:2px 0 16px;
+  }
+  .divider-arrow .line{flex:1;height:1px;background:var(--line);}
+
+  .meta-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+    gap:14px;
+    padding-top:16px;
+    border-top:1px dashed var(--line);
+  }
+  .meta-item .k{font-size:11px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px;}
+  .meta-item .v{font-size:14.5px;font-weight:600;font-family:'Tahoma',monospace;}
+
+  /* group result (new -> list of old) */
+  .group-list{list-style:none;margin:0;padding:0;}
+  .group-list li{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:11px 0;
+    border-bottom:1px solid var(--paper-deep);
+    font-size:14.5px;
+  }
+  .group-list li:last-child{border-bottom:none;}
+  .group-list .code{
+    font-family:'Tahoma',monospace;font-size:12px;color:var(--ink-soft);
+  }
+  .count-badge{
+    display:inline-flex;align-items:center;
+    background:var(--paper-deep);
+    color:var(--red-deep);
+    font-family:'Tahoma',monospace;
+    font-size:11px;font-weight:700;
+    padding:3px 9px;border-radius:20px;
+    margin-left:8px;
+  }
+
+  /* footer / data note */
+  .foot{
+    margin-top:44px;
+    padding-top:18px;
+    border-top:1px solid var(--line);
+    font-size:12.5px;
+    color:var(--ink-soft);
+    display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;
+  }
+  .foot b{color:var(--ink);}
+
+  ::selection{background:var(--gold);color:#fff;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="eyebrow">Tra cứu đơn vị hành chính trước và sau hợp nhất - tỉnh An Giang</div>
+  <h1>Tra cứu đơn vị hành chính<br>Cũ &amp; Mới</h1>
+  <p class="sub">Gõ tên xã, phường (cũ hoặc mới) để tra cứu chiều đối chiếu tương ứng. Dữ liệu hiện có <b id="scopeCount">13</b> xã/phường cũ thuộc <b id="scopeNew">3</b> đơn vị mới.</p>
+
+  <div class="tabs">
+    <div class="tab active" data-mode="old2new"><span>Tên cũ</span><span class="arrow">→</span><span>Tên mới</span></div>
+    <div class="tab" data-mode="new2old"><span>Tên mới</span><span class="arrow">→</span><span>Tên cũ</span></div>
+  </div>
+
+  <div class="search-shell">
+    <input type="text" id="searchBox" class="search-box" placeholder="Ví dụ: Dương Đông, Cửa Cạn, Hòn Tre…" autocomplete="off">
+    <button class="clear-btn" id="clearBtn" title="Xóa">✕</button>
+  </div>
+  <div class="suggestions" id="suggestions"></div>
+  <div class="hint" id="hintText">Không cần gõ dấu hay chữ hoa — nhập "duong dong" cũng tìm được "Dương Đông".</div>
+
+  <div id="results">
+    <div class="empty-state">
+      <span class="glyph">Hướng dẫn</span>
+      Nhập tên xã/phường ở ô tìm kiếm phía trên để xem kết quả đối chiếu.
+    </div>
+  </div>
+
+  <div class="foot">
+    <span><b>Nguồn:</b> Biểu tổng hợp sáp nhập đơn vị hành chính  theo Nghị quyết số 1654/NQ-UBTVQH15 ngày 16/6/2025 về việc sắp xếp các đơn vị hành chính cấp xã của tỉnh An Giang năm 2025 </span>
+    <span> *** Phòng CSDL - Văn phòng đăng ký đất đai tỉnh An Giang ***</span>
+  </div>
+</div>
+
+<script>const RAW_DATA=[{ma_moi:31105,ten_moi:"Đặc khu Thổ Châu",ten_cu:"Xã Thổ Châu",ma_cu:"31105",huyen_cu:"Thành phố Phú Quốc",ma_huyen_cu:"911"},{ma_moi:31078,ten_moi:"Đặc khu Phú Quốc",ten_cu:"Phường Dương Đông",ma_cu:"31078",huyen_cu:"Thành phố Phú Quốc",ma_huyen_cu:"911"},{ma_moi:31078,ten_moi:"Đặc khu Phú Quốc",ten_cu:"Phường An Thới",ma_cu:"31081",huyen_cu:"Thành phố Phú Quốc",ma_huyen_cu:"911"},{ma_moi:31078,ten_moi:"Đặc khu Phú Quốc",ten_cu:"Xã Cửa Cạn",ma_cu:"31084",huyen_cu:"Thành phố Phú Quốc",ma_huyen_cu:"911"},{ma_moi:31078,ten_moi:"Đặc khu Phú Quốc",ten_cu:"Xã Gành Dầu",ma_cu:"31087",huyen_cu:"Thành phố Phú Quốc",ma_huyen_cu:"911"},{ma_moi:31078,ten_moi:"Đặc khu Phú Quốc",ten_cu:"Xã Cửa Dương",ma_cu:"31090",huyen_cu:"Thành phố Phú Quốc",ma_huyen_cu:"911"},{ma_moi:31078,ten_moi:"Đặc khu Phú Quốc",ten_cu:"Xã Hàm Ninh",ma_cu:"31093",huyen_cu:"Thành phố Phú Quốc",ma_huyen_cu:"911"},{ma_moi:31078,ten_moi:"Đặc khu Phú Quốc",ten_cu:"Xã Dương Tơ",ma_cu:"31096",huyen_cu:"Thành phố Phú Quốc",ma_huyen_cu:"911"},{ma_moi:31078,ten_moi:"Đặc khu Phú Quốc",ten_cu:"Xã Bãi Thơm",ma_cu:"31102",huyen_cu:"Thành phố Phú Quốc",ma_huyen_cu:"911"},{ma_moi:31108,ten_moi:"Đặc khu Kiên Hải",ten_cu:"Xã Hòn Tre",ma_cu:"31108",huyen_cu:"Huyện Kiên Hải",ma_huyen_cu:"912"},{ma_moi:31108,ten_moi:"Đặc khu Kiên Hải",ten_cu:"Xã Lại Sơn",ma_cu:"31111",huyen_cu:"Huyện Kiên Hải",ma_huyen_cu:"912"},{ma_moi:31108,ten_moi:"Đặc khu Kiên Hải",ten_cu:"Xã An Sơn",ma_cu:"31114",huyen_cu:"Huyện Kiên Hải",ma_huyen_cu:"912"},{ma_moi:31108,ten_moi:"Đặc khu Kiên Hải",ten_cu:"Xã Nam Du",ma_cu:"31115",huyen_cu:"Huyện Kiên Hải",ma_huyen_cu:"912"},{ma_moi:30742,ten_moi:"Phường Rạch Giá",ten_cu:"Phường Vĩnh Thanh",ma_cu:"30733",huyen_cu:"Thành phố Rạch Giá",ma_huyen_cu:"899"},{ma_moi:30742,ten_moi:"Phường Rạch Giá",ten_cu:"Phường Vĩnh Quang",ma_cu:"30736",huyen_cu:"Thành phố Rạch Giá",ma_huyen_cu:"899"},{ma_moi:30742,ten_moi:"Phường Rạch Giá",ten_cu:"Phường Vĩnh Hiệp",ma_cu:"30739",huyen_cu:"Thành phố Rạch Giá",ma_huyen_cu:"899"},{ma_moi:30742,ten_moi:"Phường Rạch Giá",ten_cu:"Phường Vĩnh Thanh Vân",ma_cu:"30742",huyen_cu:"Thành phố Rạch Giá",ma_huyen_cu:"899"},{ma_moi:30742,ten_moi:"Phường Rạch Giá",ten_cu:"Phường Vĩnh Lạc",ma_cu:"30745",huyen_cu:"Thành phố Rạch Giá",ma_huyen_cu:"899"},{ma_moi:30742,ten_moi:"Phường Rạch Giá",ten_cu:"Phường An Hòa",ma_cu:"30748",huyen_cu:"Thành phố Rạch Giá",ma_huyen_cu:"899"},{ma_moi:30742,ten_moi:"Phường Rạch Giá",ten_cu:"Phường An Bình",ma_cu:"30751",huyen_cu:"Thành phố Rạch Giá",ma_huyen_cu:"899"},{ma_moi:30742,ten_moi:"Phường Rạch Giá",ten_cu:"Phường Rạch Sỏi",ma_cu:"30754",huyen_cu:"Thành phố Rạch Giá",ma_huyen_cu:"899"},{ma_moi:30742,ten_moi:"Phường Rạch Giá",ten_cu:"Phường Vĩnh Lợi",ma_cu:"30757",huyen_cu:"Thành phố Rạch Giá",ma_huyen_cu:"899"},{ma_moi:30760,ten_moi:"Phường Vĩnh Thông",ten_cu:"Phường Vĩnh Thông",ma_cu:"30760",huyen_cu:"Thành phố Rạch Giá",ma_huyen_cu:"899"},{ma_moi:30760,ten_moi:"Phường Vĩnh Thông",ten_cu:"Xã Phi Thông",ma_cu:"30763",huyen_cu:"Thành phố Rạch Giá",ma_huyen_cu:"899"},{ma_moi:30760,ten_moi:"Phường Vĩnh Thông",ten_cu:"Xã Mỹ Lâm",ma_cu:"30844",huyen_cu:"Huyện Hòn Đất",ma_huyen_cu:"903"},{ma_moi:30817,ten_moi:"xã Hòn Đất",ten_cu:"Thị trấn Hòn Đất",ma_cu:"30817",huyen_cu:"Huyện Hòn Đất",ma_huyen_cu:"903"},{ma_moi:30817,ten_moi:"xã Hòn Đất",ten_cu:"Xã Lình Huỳnh",ma_cu:"30840",huyen_cu:"Huyện Hòn Đất",ma_huyen_cu:"903"},{ma_moi:30817,ten_moi:"xã Hòn Đất",ten_cu:"Xã Thổ Sơn",ma_cu:"30841",huyen_cu:"Huyện Hòn Đất",ma_huyen_cu:"903"},{ma_moi:30817,ten_moi:"xã Hòn Đất",ten_cu:"Xã Nam Thái Sơn",ma_cu:"30829",huyen_cu:"Huyện Hòn Đất",ma_huyen_cu:"903"},{ma_moi:30823,ten_moi:"xã Bình Sơn",ten_cu:"Xã Bình Sơn",ma_cu:"30823",huyen_cu:"Huyện Hòn Đất",ma_huyen_cu:"903"},{ma_moi:30826,ten_moi:"xã Bình Giang",ten_cu:"Xã Bình Giang",ma_cu:"30826",huyen_cu:"Huyện Hòn Đất",ma_huyen_cu:"903"},{ma_moi:30838,ten_moi:"xã Mỹ Thuận",ten_cu:"Thị trấn Sóc Sơn",ma_cu:"30820",huyen_cu:"Huyện Hòn Đất",ma_huyen_cu:"903"},{ma_moi:30838,ten_moi:"xã Mỹ Thuận",ten_cu:"Xã Mỹ Thuận",ma_cu:"30838",huyen_cu:"Huyện Hòn Đất",ma_huyen_cu:"903"},{ma_moi:30838,ten_moi:"xã Mỹ Thuận",ten_cu:"Xã Mỹ Phước",ma_cu:"30847",huyen_cu:"Huyện Hòn Đất",ma_huyen_cu:"903"},{ma_moi:30838,ten_moi:"xã Mỹ Thuận",ten_cu:"Xã Mỹ Hiệp Sơn",ma_cu:"30832",huyen_cu:"Huyện Hòn Đất",ma_huyen_cu:"903"},{ma_moi:30835,ten_moi:"xã Sơn Kiên",ten_cu:"Xã Sơn Kiên",ma_cu:"30835",huyen_cu:"Huyện Hòn Đất",ma_huyen_cu:"903"},{ma_moi:30835,ten_moi:"xã Sơn Kiên",ten_cu:"Xã Sơn Bình",ma_cu:"30836",huyen_cu:"Huyện Hòn Đất",ma_huyen_cu:"903"},{ma_moi:30835,ten_moi:"xã Sơn Kiên",ten_cu:"Xã Mỹ Thái",ma_cu:"30828",huyen_cu:"Huyện Hòn Đất",ma_huyen_cu:"903"},{ma_moi:30769,ten_moi:"Phường Hà Tiên",ten_cu:"Phường Đông Hồ",ma_cu:"30769",huyen_cu:"Thành phố Hà Tiên",ma_huyen_cu:"900"},{ma_moi:30769,ten_moi:"Phường Hà Tiên",ten_cu:"Phường Bình San",ma_cu:"30772",huyen_cu:"Thành phố Hà Tiên",ma_huyen_cu:"900"},{ma_moi:30769,ten_moi:"Phường Hà Tiên",ten_cu:"Phường Pháo Đài",ma_cu:"30775",huyen_cu:"Thành phố Hà Tiên",ma_huyen_cu:"900"},{ma_moi:30769,ten_moi:"Phường Hà Tiên",ten_cu:"Phường Mỹ Đức",ma_cu:"30778",huyen_cu:"Thành phố Hà Tiên",ma_huyen_cu:"900"},{ma_moi:30781,ten_moi:"Xã Tiên Hải",ten_cu:"Xã Tiên Hải",ma_cu:"30781",huyen_cu:"Thành phố Hà Tiên",ma_huyen_cu:"900"},{ma_moi:30766,ten_moi:"Phường Tô Châu",ten_cu:"Phường Tô Châu",ma_cu:"30766",huyen_cu:"Thành phố Hà Tiên",ma_huyen_cu:"900"},{ma_moi:30766,ten_moi:"Phường Tô Châu",ten_cu:"Xã Thuận Yên",ma_cu:"30784",huyen_cu:"Thành phố Hà Tiên",ma_huyen_cu:"900"},{ma_moi:30766,ten_moi:"Phường Tô Châu",ten_cu:"Xã Dương Hòa",ma_cu:"30805",huyen_cu:"Huyện Kiên Lương",ma_huyen_cu:"902"},{ma_moi:30790,ten_moi:"xã Hòa Điền",ten_cu:"Xã Kiên Bình",ma_cu:"30790",huyen_cu:"Huyện Kiên Lương",ma_huyen_cu:"902"},{ma_moi:30790,ten_moi:"xã Hòa Điền",ten_cu:"Xã Hòa Điền",ma_cu:"30802",huyen_cu:"Huyện Kiên Lương",ma_huyen_cu:"902"},{ma_moi:30787,ten_moi:"xã Kiên Lương",ten_cu:"Thị trấn Kiên Lương",ma_cu:"30787",huyen_cu:"Huyện Kiên Lương",ma_huyen_cu:"902"},{ma_moi:30787,ten_moi:"xã Kiên Lương",ten_cu:"Xã Bình An",ma_cu:"30808",huyen_cu:"Huyện Kiên Lương",ma_huyen_cu:"902"},{ma_moi:30787,ten_moi:"xã Kiên Lương",ten_cu:"Xã Bình Trị",ma_cu:"30809",huyen_cu:"Huyện Kiên Lương",ma_huyen_cu:"902"},{ma_moi:30811,ten_moi:"Xã Sơn Hải",ten_cu:"Xã Sơn Hải",ma_cu:"30811",huyen_cu:"Huyện Kiên Lương",ma_huyen_cu:"902"},{ma_moi:30814,ten_moi:"Xã Hòn Nghệ",ten_cu:"Xã Hòn Nghệ",ma_cu:"30814",huyen_cu:"Huyện Kiên Lương",ma_huyen_cu:"902"},{ma_moi:30850,ten_moi:"Xã Tân Hiệp",ten_cu:"Thị trấn Tân Hiệp",ma_cu:"30850",huyen_cu:"Huyện Tân Hiệp",ma_huyen_cu:"904"},{ma_moi:30850,ten_moi:"Xã Tân Hiệp",ten_cu:"Xã Tân Hiệp B",ma_cu:"30859",huyen_cu:"Huyện Tân Hiệp",ma_huyen_cu:"904"},{ma_moi:30850,ten_moi:"Xã Tân Hiệp",ten_cu:"Xã Thạnh Đông B",ma_cu:"30862",huyen_cu:"Huyện Tân Hiệp",ma_huyen_cu:"904"},{ma_moi:30850,ten_moi:"Xã Tân Hiệp",ten_cu:"Xã Thạnh Đông",ma_cu:"30865",huyen_cu:"Huyện Tân Hiệp",ma_huyen_cu:"904"},{ma_moi:30874,ten_moi:"Xã Thạnh Đông",ten_cu:"Xã Tân Hiệp A",ma_cu:"30868",huyen_cu:"Huyện Tân Hiệp",ma_huyen_cu:"904"},{ma_moi:30874,ten_moi:"Xã Thạnh Đông",ten_cu:"Xã Thạnh Đông A",ma_cu:"30874",huyen_cu:"Huyện Tân Hiệp",ma_huyen_cu:"904"},{ma_moi:30874,ten_moi:"Xã Thạnh Đông",ten_cu:"Xã Thạnh Trị",ma_cu:"30877",huyen_cu:"Huyện Tân Hiệp",ma_huyen_cu:"904"},{ma_moi:30856,ten_moi:"Xã Tân Hội",ten_cu:"Xã Tân Hội",ma_cu:"30853",huyen_cu:"Huyện Tân Hiệp",ma_huyen_cu:"904"},{ma_moi:30856,ten_moi:"Xã Tân Hội",ten_cu:"Xã Tân Thành",ma_cu:"30856",huyen_cu:"Huyện Tân Hiệp",ma_huyen_cu:"904"},{ma_moi:30856,ten_moi:"Xã Tân Hội",ten_cu:"Xã Tân Hoà",ma_cu:"30860",huyen_cu:"Huyện Tân Hiệp",ma_huyen_cu:"904"},{ma_moi:30856,ten_moi:"Xã Tân Hội",ten_cu:"Xã Tân An",ma_cu:"30871",huyen_cu:"Huyện Tân Hiệp",ma_huyen_cu:"904"},{ma_moi:30886,ten_moi:"Xã Thạnh Lộc",ten_cu:"Xã Thạnh Lộc",ma_cu:"30901",huyen_cu:"Huyện Châu Thành",ma_huyen_cu:"905"},{ma_moi:30886,ten_moi:"Xã Thạnh Lộc",ten_cu:"Xã Mong Thọ A",ma_cu:"30883",huyen_cu:"Huyện Châu Thành",ma_huyen_cu:"905"},{ma_moi:30886,ten_moi:"Xã Thạnh Lộc",ten_cu:"Xã Mong Thọ B",ma_cu:"30886",huyen_cu:"Huyện Châu Thành",ma_huyen_cu:"905"},{ma_moi:30886,ten_moi:"Xã Thạnh Lộc",ten_cu:"Xã Mong Thọ",ma_cu:"30887",huyen_cu:"Huyện Châu Thành",ma_huyen_cu:"905"},{ma_moi:30880,ten_moi:"Xã Châu Thành",ten_cu:"Thị trấn Minh Lương",ma_cu:"30880",huyen_cu:"Huyện Châu Thành",ma_huyen_cu:"905"},{ma_moi:30880,ten_moi:"Xã Châu Thành",ten_cu:"Xã Minh Hòa",ma_cu:"30895",huyen_cu:"Huyện Châu Thành",ma_huyen_cu:"905"},{ma_moi:30880,ten_moi:"Xã Châu Thành",ten_cu:"Xã Giục Tượng",ma_cu:"30889",huyen_cu:"Huyện Châu Thành",ma_huyen_cu:"905"},{ma_moi:30898,ten_moi:"Xã Bình An",ten_cu:"Xã Vĩnh Hòa Hiệp",ma_cu:"30892",huyen_cu:"Huyện Châu Thành",ma_huyen_cu:"905"},{ma_moi:30898,ten_moi:"Xã Bình An",ten_cu:"Xã Vĩnh Hoà Phú",ma_cu:"30893",huyen_cu:"Huyện Châu Thành",ma_huyen_cu:"905"},{ma_moi:30898,ten_moi:"Xã Bình An",ten_cu:"Xã Bình An",ma_cu:"30808",huyen_cu:"Huyện Châu Thành",ma_huyen_cu:"905"},{ma_moi:30904,ten_moi:"Xã Giồng Riềng",ten_cu:"Thị trấn Giồng Riềng",ma_cu:"30904",huyen_cu:"Huyện Giồng Riềng",ma_huyen_cu:"906"},{ma_moi:30904,ten_moi:"Xã Giồng Riềng",ten_cu:"Xã Bàn Thạch",ma_cu:"30919",huyen_cu:"Huyện Giồng Riềng",ma_huyen_cu:"906"},{ma_moi:30904,ten_moi:"Xã Giồng Riềng",ten_cu:"Xã Bàn Tân Định",ma_cu:"30922",huyen_cu:"Huyện Giồng Riềng",ma_huyen_cu:"906"},{ma_moi:30904,ten_moi:"Xã Giồng Riềng",ten_cu:"Xã Thạnh Hòa",ma_cu:"30916",huyen_cu:"Huyện Giồng Riềng",ma_huyen_cu:"906"},{ma_moi:30904,ten_moi:"Xã Giồng Riềng",ten_cu:"Xã Thạnh Bình",ma_cu:"30917",huyen_cu:"Huyện Giồng Riềng",ma_huyen_cu:"906"},{ma_moi:30910,ten_moi:"Xã Thạnh Hưng",ten_cu:"Xã Thạnh Hưng",ma_cu:"30907",huyen_cu:"Huyện Giồng Riềng",ma_huyen_cu:"906"},{ma_moi:30910,ten_moi:"Xã Thạnh Hưng",ten_cu:"Xã Thạnh Phước",ma_cu:"30910",huyen_cu:"Huyện Giồng Riềng",ma_huyen_cu:"906"},{ma_moi:30910,ten_moi:"Xã Thạnh Hưng",ten_cu:"Xã Thạnh Lộc",ma_cu:"30901",huyen_cu:"Huyện Giồng Riềng",ma_huyen_cu:"906"},{ma_moi:30943,ten_moi:"Xã Long Thạnh",ten_cu:"Xã Long Thạnh",ma_cu:"30943",huyen_cu:"Huyện Giồng Riềng",ma_huyen_cu:"906"},{ma_moi:30943,ten_moi:"Xã Long Thạnh",ten_cu:"Xã Vĩnh Thạnh",ma_cu:"30946",huyen_cu:"Huyện Giồng Riềng",ma_huyen_cu:"906"},{ma_moi:30943,ten_moi:"Xã Long Thạnh",ten_cu:"Xã Vĩnh Phú",ma_cu:"30947",huyen_cu:"Huyện Giồng Riềng",ma_huyen_cu:"906"},{ma_moi:30934,ten_moi:"Xã Hòa Hưng",ten_cu:"Xã Hòa Hưng",ma_cu:"30934",huyen_cu:"Huyện Giồng Riềng",ma_huyen_cu:"906"},{ma_moi:30934,ten_moi:"Xã Hòa Hưng",ten_cu:"Xã Hoà Lợi",ma_cu:"30937",huyen_cu:"Huyện Giồng Riềng",ma_huyen_cu:"906"},{ma_moi:30934,ten_moi:"Xã Hòa Hưng",ten_cu:"Xã Hoà An",ma_cu:"30940",huyen_cu:"Huyện Giồng Riềng",ma_huyen_cu:"906"},{ma_moi:30928,ten_moi:"Xã Ngọc Chúc",ten_cu:"Xã Ngọc Thành",ma_cu:"30925",huyen_cu:"Huyện Giồng Riềng",ma_huyen_cu:"906"},{ma_moi:30928,ten_moi:"Xã Ngọc Chúc",ten_cu:"Xã Ngọc Chúc",ma_cu:"30928",huyen_cu:"Huyện Giồng Riềng",ma_huyen_cu:"906"},{ma_moi:30928,ten_moi:"Xã Ngọc Chúc",ten_cu:"Xã Ngọc Thuận",ma_cu:"30931",huyen_cu:"Huyện Giồng Riềng",ma_huyen_cu:"906"},{ma_moi:30949,ten_moi:"Xã Hòa Thuận",ten_cu:"Xã Hòa Thuận",ma_cu:"30949",huyen_cu:"Huyện Giồng Riềng",ma_huyen_cu:"906"},{ma_moi:30949,ten_moi:"Xã Hòa Thuận",ten_cu:"Xã Ngọc Hoà",ma_cu:"30950",huyen_cu:"Huyện Giồng Riềng",ma_huyen_cu:"906"},{ma_moi:30958,ten_moi:"Xã Định Hòa",ten_cu:"Xã Định Hòa",ma_cu:"30958",huyen_cu:"Huyện Gò Quao",ma_huyen_cu:"907"},{ma_moi:30958,ten_moi:"Xã Định Hòa",ten_cu:"Xã Thới Quản",ma_cu:"30961",huyen_cu:"Huyện Gò Quao",ma_huyen_cu:"907"},{ma_moi:30958,ten_moi:"Xã Định Hòa",ten_cu:"Xã Thủy Liễu",ma_cu:"30967",huyen_cu:"Huyện Gò Quao",ma_huyen_cu:"907"},{ma_moi:30952,ten_moi:"Xã Gò Quao",ten_cu:"Thị trấn Gò Quao",ma_cu:"30952",huyen_cu:"Huyện Gò Quao",ma_huyen_cu:"907"},{ma_moi:30952,ten_moi:"Xã Gò Quao",ten_cu:"Xã Định An",ma_cu:"30964",huyen_cu:"Huyện Gò Quao",ma_huyen_cu:"907"},{ma_moi:30952,ten_moi:"Xã Gò Quao",ten_cu:"Xã Vĩnh Phước B",ma_cu:"30976",huyen_cu:"Huyện Gò Quao",ma_huyen_cu:"907"},{ma_moi:30970,ten_moi:"Xã Vĩnh Hòa Hưng",ten_cu:"Xã Vĩnh Hòa Hưng Bắc",ma_cu:"30955",huyen_cu:"Huyện Gò Quao",ma_huyen_cu:"907"},{ma_moi:30970,ten_moi:"Xã Vĩnh Hòa Hưng",ten_cu:"Xã Vĩnh Hòa Hưng Nam",ma_cu:"30970",huyen_cu:"Huyện Gò Quao",ma_huyen_cu:"907"},{ma_moi:30982,ten_moi:"Xã Vĩnh Tuy",ten_cu:"Xã Vĩnh Thắng",ma_cu:"30982",huyen_cu:"Huyện Gò Quao",ma_huyen_cu:"907"},{ma_moi:30982,ten_moi:"Xã Vĩnh Tuy",ten_cu:"Xã Vĩnh Tuy",ma_cu:"30979",huyen_cu:"Huyện Gò Quao",ma_huyen_cu:"907"},{ma_moi:30982,ten_moi:"Xã Vĩnh Tuy",ten_cu:"Xã Vĩnh Phước A",ma_cu:"30973",huyen_cu:"Huyện Gò Quao",ma_huyen_cu:"907"},{ma_moi:30988,ten_moi:"Xã Tây Yên",ten_cu:"Xã Tây Yên",ma_cu:"30988",huyen_cu:"Huyện An Biên",ma_huyen_cu:"908"},{ma_moi:30988,ten_moi:"Xã Tây Yên",ten_cu:"Xã Tây Yên A",ma_cu:"30991",huyen_cu:"Huyện An Biên",ma_huyen_cu:"908"},{ma_moi:30988,ten_moi:"Xã Tây Yên",ten_cu:"Xã Nam Yên",ma_cu:"30994",huyen_cu:"Huyện An Biên",ma_huyen_cu:"908"},{ma_moi:31006,ten_moi:"Xã Đông Thái",ten_cu:"Xã Nam Thái",ma_cu:"31000",huyen_cu:"Huyện An Biên",ma_huyen_cu:"908"},{ma_moi:31006,ten_moi:"Xã Đông Thái",ten_cu:"Xã Nam Thái A",ma_cu:"31003",huyen_cu:"Huyện An Biên",ma_huyen_cu:"908"},{ma_moi:31006,ten_moi:"Xã Đông Thái",ten_cu:"Xã Đông Thái",ma_cu:"31006",huyen_cu:"Huyện An Biên",ma_huyen_cu:"908"},{ma_moi:30985,ten_moi:"Xã An Biên",ten_cu:"Thị trấn Thứ Ba",ma_cu:"30985",huyen_cu:"Huyện An Biên",ma_huyen_cu:"908"},{ma_moi:30985,ten_moi:"Xã An Biên",ten_cu:"Xã Hưng Yên",ma_cu:"30997",huyen_cu:"Huyện An Biên",ma_huyen_cu:"908"},{ma_moi:30985,ten_moi:"Xã An Biên",ten_cu:"Xã Đông Yên",ma_cu:"31009",huyen_cu:"Huyện An Biên",ma_huyen_cu:"908"},{ma_moi:31024,ten_moi:"Xã Đông Hòa",ten_cu:"Xã Đông Hòa",ma_cu:"31024",huyen_cu:"Huyện An Minh",ma_huyen_cu:"909"},{ma_moi:31024,ten_moi:"Xã Đông Hòa",ten_cu:"Xã Đông Thạnh",ma_cu:"31030",huyen_cu:"Huyện An Minh",ma_huyen_cu:"909"},{ma_moi:31031,ten_moi:"Xã Tân Thạnh",ten_cu:"Xã Thuận Hoà",ma_cu:"31021",huyen_cu:"Huyện An Minh",ma_huyen_cu:"909"},{ma_moi:31031,ten_moi:"Xã Tân Thạnh",ten_cu:"Xã Tân Thạnh",ma_cu:"31031",huyen_cu:"Huyện An Minh",ma_huyen_cu:"909"},{ma_moi:31018,ten_moi:"Xã An Minh",ten_cu:"Thị trấn Thứ Mười Một",ma_cu:"31018",huyen_cu:"Huyện An Minh",ma_huyen_cu:"909"},{ma_moi:31018,ten_moi:"Xã An Minh",ten_cu:"Xã Đông Hưng B",ma_cu:"31039",huyen_cu:"Huyện An Minh",ma_huyen_cu:"909"},{ma_moi:31018,ten_moi:"Xã An Minh",ten_cu:"Xã Đông Hưng",ma_cu:"31033",huyen_cu:"Huyện An Minh",ma_huyen_cu:"909"},{ma_moi:31042,ten_moi:"Xã Vân Khánh",ten_cu:"Xã Vân Khánh",ma_cu:"31042",huyen_cu:"Huyện An Minh",ma_huyen_cu:"909"},{ma_moi:31042,ten_moi:"Xã Vân Khánh",ten_cu:"Xã Vân Khánh Tây",ma_cu:"31048",huyen_cu:"Huyện An Minh",ma_huyen_cu:"909"},{ma_moi:31036,ten_moi:"Xã Đông Hưng",ten_cu:"Xã Đông Hưng A",ma_cu:"31036",huyen_cu:"Huyện An Minh",ma_huyen_cu:"909"},{ma_moi:31036,ten_moi:"Xã Đông Hưng",ten_cu:"Xã Vân Khánh Đông",ma_cu:"31045",huyen_cu:"Huyện An Minh",ma_huyen_cu:"909"},{ma_moi:31064,ten_moi:"Xã Vĩnh Bình",ten_cu:"Xã Vĩnh Bình Bắc",ma_cu:"31060",huyen_cu:"Huyện Vĩnh Thuận",ma_huyen_cu:"910"},{ma_moi:31064,ten_moi:"Xã Vĩnh Bình",ten_cu:"Xã Vĩnh Bình Nam",ma_cu:"31063",huyen_cu:"Huyện Vĩnh Thuận",ma_huyen_cu:"910"},{ma_moi:31064,ten_moi:"Xã Vĩnh Bình",ten_cu:"Xã Bình Minh",ma_cu:"31064",huyen_cu:"Huyện Vĩnh Thuận",ma_huyen_cu:"910"},{ma_moi:31069,ten_moi:"Xã Vĩnh Thuận",ten_cu:"Xã Vĩnh Thuận",ma_cu:"31069",huyen_cu:"Huyện Vĩnh Thuận",ma_huyen_cu:"910"},{ma_moi:31069,ten_moi:"Xã Vĩnh Thuận",ten_cu:"Xã Tân Thuận",ma_cu:"31072",huyen_cu:"Huyện Vĩnh Thuận",ma_huyen_cu:"910"},{ma_moi:31051,ten_moi:"Xã Vĩnh Phong",ten_cu:"Thị trấn Vĩnh Thuận",ma_cu:"31051",huyen_cu:"Huyện Vĩnh Thuận",ma_huyen_cu:"910"},{ma_moi:31051,ten_moi:"Xã Vĩnh Phong",ten_cu:"Xã Phong Đông",ma_cu:"31074",huyen_cu:"Huyện Vĩnh Thuận",ma_huyen_cu:"910"},{ma_moi:31051,ten_moi:"Xã Vĩnh Phong",ten_cu:"Xã Vĩnh Phong",ma_cu:"31075",huyen_cu:"Huyện Vĩnh Thuận",ma_huyen_cu:"910"},{ma_moi:31012,ten_moi:"Xã Vĩnh Hòa",ten_cu:"Xã Thạnh Yên",ma_cu:"31012",huyen_cu:"Huyện U Minh Thượng",ma_huyen_cu:"913"},{ma_moi:31012,ten_moi:"Xã Vĩnh Hòa",ten_cu:"Xã Thạnh Yên A",ma_cu:"31015",huyen_cu:"Huyện U Minh Thượng",ma_huyen_cu:"913"},{ma_moi:31012,ten_moi:"Xã Vĩnh Hòa",ten_cu:"Xã Vĩnh Hòa",ma_cu:"31054",huyen_cu:"Huyện U Minh Thượng",ma_huyen_cu:"913"},{ma_moi:31012,ten_moi:"Xã Vĩnh Hòa",ten_cu:"Xã Hoà Chánh",ma_cu:"31057",huyen_cu:"Huyện U Minh Thượng",ma_huyen_cu:"913"},{ma_moi:31027,ten_moi:"Xã U Minh Thượng",ten_cu:"Xã An Minh Bắc",ma_cu:"31027",huyen_cu:"Huyện U Minh Thượng",ma_huyen_cu:"913"},{ma_moi:31027,ten_moi:"Xã U Minh Thượng",ten_cu:"Xã Minh Thuận",ma_cu:"31066",huyen_cu:"Huyện U Minh Thượng",ma_huyen_cu:"913"},{ma_moi:30793,ten_moi:"Xã Vĩnh Điều",ten_cu:"Xã Vĩnh Phú",ma_cu:"30947",huyen_cu:"Huyện Giang Thành",ma_huyen_cu:"914"},{ma_moi:30793,ten_moi:"Xã Vĩnh Điều",ten_cu:"Xã Vĩnh Điều",ma_cu:"30793",huyen_cu:"Huyện Giang Thành",ma_huyen_cu:"914"},{ma_moi:30796,ten_moi:"Xã Giang Thành",ten_cu:"Xã Tân Khánh Hòa",ma_cu:"30796",huyen_cu:"Huyện Giang Thành",ma_huyen_cu:"914"},{ma_moi:30796,ten_moi:"Xã Giang Thành",ten_cu:"Xã Phú Lợi",ma_cu:"30797",huyen_cu:"Huyện Giang Thành",ma_huyen_cu:"914"},{ma_moi:30796,ten_moi:"Xã Giang Thành",ten_cu:"Xã Phú Mỹ",ma_cu:"30799",huyen_cu:"Huyện Giang Thành",ma_huyen_cu:"914"},{ma_moi:30307,ten_moi:"Phường Long Xuyên",ten_cu:"Phường Mỹ Bình",ma_cu:"30280",huyen_cu:"Thành phố Long Xuyên",ma_huyen_cu:"883"},{ma_moi:30307,ten_moi:"Phường Long Xuyên",ten_cu:"Phường Mỹ Long",ma_cu:"30283",huyen_cu:"Thành phố Long Xuyên",ma_huyen_cu:"883"},{ma_moi:30307,ten_moi:"Phường Long Xuyên",ten_cu:"Phường Mỹ Xuyên",ma_cu:"30286",huyen_cu:"Thành phố Long Xuyên",ma_huyen_cu:"883"},{ma_moi:30307,ten_moi:"Phường Long Xuyên",ten_cu:"Phường Mỹ Phước",ma_cu:"30295",huyen_cu:"Thành phố Long Xuyên",ma_huyen_cu:"883"},{ma_moi:30307,ten_moi:"Phường Long Xuyên",ten_cu:"Phường Mỹ Hòa",ma_cu:"30307",huyen_cu:"Thành phố Long Xuyên",ma_huyen_cu:"883"},{ma_moi:30307,ten_moi:"Phường Long Xuyên",ten_cu:"Phường Mỹ Quý",ma_cu:"30298",huyen_cu:"Thành phố Long Xuyên",ma_huyen_cu:"883"},{ma_moi:30292,ten_moi:"Phường Bình Đức",ten_cu:"Phường Bình Đức",ma_cu:"30289",huyen_cu:"Thành phố Long Xuyên",ma_huyen_cu:"883"},{ma_moi:30292,ten_moi:"Phường Bình Đức",ten_cu:"Phường Bình Khánh",ma_cu:"30292",huyen_cu:"Thành phố Long Xuyên",ma_huyen_cu:"883"},{ma_moi:30292,ten_moi:"Phường Bình Đức",ten_cu:"Xã Mỹ Khánh",ma_cu:"30310",huyen_cu:"Thành phố Long Xuyên",ma_huyen_cu:"883"},{ma_moi:30301,ten_moi:"Phường Mỹ Thới",ten_cu:"Phường Mỹ Thới",ma_cu:"30301",huyen_cu:"Thành phố Long Xuyên",ma_huyen_cu:"883"},{ma_moi:30301,ten_moi:"Phường Mỹ Thới",ten_cu:"Phường Mỹ Thạnh",ma_cu:"30304",huyen_cu:"Thành phố Long Xuyên",ma_huyen_cu:"883"},{ma_moi:30313,ten_moi:"Xã Mỹ Hòa Hưng",ten_cu:"Xã Mỹ Hòa Hưng",ma_cu:"30313",huyen_cu:"Thành phố Long Xuyên",ma_huyen_cu:"883"},{ma_moi:30316,ten_moi:"Phường Châu Đốc",ten_cu:"Phường Châu Phú A",ma_cu:"30319",huyen_cu:"Thành phố Châu Đốc",ma_huyen_cu:"884"},{ma_moi:30316,ten_moi:"Phường Châu Đốc",ten_cu:"Phường Châu Phú B",ma_cu:"30316",huyen_cu:"Thành phố Châu Đốc",ma_huyen_cu:"884"},{ma_moi:30316,ten_moi:"Phường Châu Đốc",ten_cu:"Phường Vĩnh Ngươn",ma_cu:"30328",huyen_cu:"Thành phố Châu Đốc",ma_huyen_cu:"884"},{ma_moi:30316,ten_moi:"Phường Châu Đốc",ten_cu:"Phường Vĩnh Mỹ",ma_cu:"30322",huyen_cu:"Thành phố Châu Đốc",ma_huyen_cu:"884"},{ma_moi:30316,ten_moi:"Phường Châu Đốc",ten_cu:"Xã Vĩnh Châu",ma_cu:"30334",huyen_cu:"Thành phố Châu Đốc",ma_huyen_cu:"884"},{ma_moi:30325,ten_moi:"Phường Vĩnh Tế",ten_cu:"Phường Núi Sam",ma_cu:"30325",huyen_cu:"Thành phố Châu Đốc",ma_huyen_cu:"884"},{ma_moi:30325,ten_moi:"Phường Vĩnh Tế",ten_cu:"Xã Vĩnh Tế",ma_cu:"30331",huyen_cu:"Thành phố Châu Đốc",ma_huyen_cu:"884"},{ma_moi:30325,ten_moi:"Phường Vĩnh Tế",ten_cu:"Xã Vĩnh Châu",ma_cu:"30334",huyen_cu:"Thành phố Châu Đốc",ma_huyen_cu:"884"},{ma_moi:30337,ten_moi:"Xã An Phú",ten_cu:"Thị trấn An Phú",ma_cu:"30337",huyen_cu:"Huyện An Phú",ma_huyen_cu:"886"},{ma_moi:30337,ten_moi:"Xã An Phú",ten_cu:"Xã Vĩnh Hội Đông",ma_cu:"30370",huyen_cu:"Huyện An Phú",ma_huyen_cu:"886"},{ma_moi:30337,ten_moi:"Xã An Phú",ten_cu:"Xã Phú Hội",ma_cu:"30355",huyen_cu:"Huyện An Phú",ma_huyen_cu:"886"},{ma_moi:30337,ten_moi:"Xã An Phú",ten_cu:"Xã Phước Hưng",ma_cu:"30358",huyen_cu:"Huyện An Phú",ma_huyen_cu:"886"},{ma_moi:30367,ten_moi:"Xã Vĩnh Hậu",ten_cu:"Thị trấn Đa Phước",ma_cu:"30373",huyen_cu:"Huyện An Phú",ma_huyen_cu:"886"},{ma_moi:30367,ten_moi:"Xã Vĩnh Hậu",ten_cu:"Xã Vĩnh Hậu",ma_cu:"30364",huyen_cu:"Huyện An Phú",ma_huyen_cu:"886"},{ma_moi:30367,ten_moi:"Xã Vĩnh Hậu",ten_cu:"Xã Vĩnh Trường",ma_cu:"30367",huyen_cu:"Huyện An Phú",ma_huyen_cu:"886"},{ma_moi:30346,ten_moi:"Xã Nhơn Hội",ten_cu:"Xã Nhơn Hội",ma_cu:"30349",huyen_cu:"Huyện An Phú",ma_huyen_cu:"886"},{ma_moi:30346,ten_moi:"Xã Nhơn Hội",ten_cu:"Xã Quốc Thái",ma_cu:"30346",huyen_cu:"Huyện An Phú",ma_huyen_cu:"886"},{ma_moi:30341,ten_moi:"Xã Khánh Bình",ten_cu:"Thị trấn Long Bình",ma_cu:"30341",huyen_cu:"Huyện An Phú",ma_huyen_cu:"886"},{ma_moi:30341,ten_moi:"Xã Khánh Bình",ten_cu:"Xã Khánh An",ma_cu:"30340",huyen_cu:"Huyện An Phú",ma_huyen_cu:"886"},{ma_moi:30341,ten_moi:"Xã Khánh Bình",ten_cu:"Xã Khánh Bình",ma_cu:"30343",huyen_cu:"Huyện An Phú",ma_huyen_cu:"886"},{ma_moi:30352,ten_moi:"Xã Phú Hữu",ten_cu:"Xã Phú Hữu",ma_cu:"30352",huyen_cu:"Huyện An Phú",ma_huyen_cu:"886"},{ma_moi:30352,ten_moi:"Xã Phú Hữu",ten_cu:"Xã Vĩnh Lộc",ma_cu:"30361",huyen_cu:"Huyện An Phú",ma_huyen_cu:"886"},{ma_moi:30388,ten_moi:"Xã Tân An",ten_cu:"Xã Tân Thạnh",ma_cu:"30387",huyen_cu:"Thị xã Tân Châu",ma_huyen_cu:"887"},{ma_moi:30388,ten_moi:"Xã Tân An",ten_cu:"Xã Tân An",ma_cu:"30388",huyen_cu:"Thị xã Tân Châu",ma_huyen_cu:"887"},{ma_moi:30388,ten_moi:"Xã Tân An",ten_cu:"Xã Long An",ma_cu:"30391",huyen_cu:"Thị xã Tân Châu",ma_huyen_cu:"887"},{ma_moi:30403,ten_moi:"Xã Châu Phong",ten_cu:"Xã Phú Vĩnh",ma_cu:"30400",huyen_cu:"Thị xã Tân Châu",ma_huyen_cu:"887"},{ma_moi:30403,ten_moi:"Xã Châu Phong",ten_cu:"Xã Lê Chánh",ma_cu:"30403",huyen_cu:"Thị xã Tân Châu",ma_huyen_cu:"887"},{ma_moi:30403,ten_moi:"Xã Châu Phong",ten_cu:"Xã Châu Phong",ma_cu:"30397",huyen_cu:"Thị xã Tân Châu",ma_huyen_cu:"887"},{ma_moi:30385,ten_moi:"Xã Vĩnh Xương",ten_cu:"Xã Phú Lộc",ma_cu:"30379",huyen_cu:"Thị xã Tân Châu",ma_huyen_cu:"887"},{ma_moi:30385,ten_moi:"Xã Vĩnh Xương",ten_cu:"Xã Vĩnh Xương",ma_cu:"30382",huyen_cu:"Thị xã Tân Châu",ma_huyen_cu:"887"},{ma_moi:30385,ten_moi:"Xã Vĩnh Xương",ten_cu:"Xã Vĩnh Hòa",ma_cu:"30385",huyen_cu:"Thị xã Tân Châu",ma_huyen_cu:"887"},{ma_moi:30376,ten_moi:"Phường Tân Châu",ten_cu:"Phường Long Thạnh",ma_cu:"30376",huyen_cu:"Thị xã Tân Châu",ma_huyen_cu:"887"},{ma_moi:30376,ten_moi:"Phường Tân Châu",ten_cu:"Phường Long Sơn",ma_cu:"30412",huyen_cu:"Thị xã Tân Châu",ma_huyen_cu:"887"},{ma_moi:30377,ten_moi:"Phường Long Phú",ten_cu:"Phường Long Hưng",ma_cu:"30377",huyen_cu:"Thị xã Tân Châu",ma_huyen_cu:"887"},{ma_moi:30377,ten_moi:"Phường Long Phú",ten_cu:"Phường Long Châu",ma_cu:"30378",huyen_cu:"Thị xã Tân Châu",ma_huyen_cu:"887"},{ma_moi:30377,ten_moi:"Phường Long Phú",ten_cu:"Phường Long Phú",ma_cu:"30394",huyen_cu:"Thị xã Tân Châu",ma_huyen_cu:"887"},{ma_moi:30406,ten_moi:"Xã Phú Tân",ten_cu:"Thị trấn Phú Mỹ",ma_cu:"30406",huyen_cu:"Huyện Phú Tân",ma_huyen_cu:"888"},{ma_moi:30406,ten_moi:"Xã Phú Tân",ten_cu:"Xã Tân Trung",ma_cu:"30460",huyen_cu:"Huyện Phú Tân",ma_huyen_cu:"888"},{ma_moi:30406,ten_moi:"Xã Phú Tân",ten_cu:"Xã Tân Hòa",ma_cu:"30457",huyen_cu:"Huyện Phú Tân",ma_huyen_cu:"888"},{ma_moi:30406,ten_moi:"Xã Phú Tân",ten_cu:"Xã Phú Hưng",ma_cu:"30451",huyen_cu:"Huyện Phú Tân",ma_huyen_cu:"888"},{ma_moi:30436,ten_moi:"Xã Phú An",ten_cu:"Xã Phú Thọ",ma_cu:"30448",huyen_cu:"Huyện Phú Tân",ma_huyen_cu:"888"},{ma_moi:30436,ten_moi:"Xã Phú An",ten_cu:"Xã Phú Xuân",ma_cu:"30439",huyen_cu:"Huyện Phú Tân",ma_huyen_cu:"888"},{ma_moi:30436,ten_moi:"Xã Phú An",ten_cu:"Xã Phú An",ma_cu:"30436",huyen_cu:"Huyện Phú Tân",ma_huyen_cu:"888"},{ma_moi:30445,ten_moi:"Xã Bình Thạnh Đông",ten_cu:"Xã Hiệp Xương",ma_cu:"30442",huyen_cu:"Huyện Phú Tân",ma_huyen_cu:"888"},{ma_moi:30445,ten_moi:"Xã Bình Thạnh Đông",ten_cu:"Xã Phú Bình",ma_cu:"30445",huyen_cu:"Huyện Phú Tân",ma_huyen_cu:"888"},{ma_moi:30445,ten_moi:"Xã Bình Thạnh Đông",ten_cu:"Xã Bình Thạnh Đông",ma_cu:"30454",huyen_cu:"Huyện Phú Tân",ma_huyen_cu:"888"},{ma_moi:30409,ten_moi:"Xã Chợ Vàm",ten_cu:"Thị trấn Chợ Vàm",ma_cu:"30409",huyen_cu:"Huyện Phú Tân",ma_huyen_cu:"888"},{ma_moi:30409,ten_moi:"Xã Chợ Vàm",ten_cu:"Xã Phú Thành",ma_cu:"30433",huyen_cu:"Huyện Phú Tân",ma_huyen_cu:"888"},{ma_moi:30409,ten_moi:"Xã Chợ Vàm",ten_cu:"Xã Phú Thạnh",ma_cu:"30427",huyen_cu:"Huyện Phú Tân",ma_huyen_cu:"888"},{ma_moi:30430,ten_moi:"Xã Hòa Lạc",ten_cu:"Xã Hòa Lạc",ma_cu:"30430",huyen_cu:"Huyện Phú Tân",ma_huyen_cu:"888"},{ma_moi:30430,ten_moi:"Xã Hòa Lạc",ten_cu:"Xã Phú Hiệp",ma_cu:"30424",huyen_cu:"Huyện Phú Tân",ma_huyen_cu:"888"},{ma_moi:30421,ten_moi:"Xã Phú Lâm",ten_cu:"Xã Long Hòa",ma_cu:"30415",huyen_cu:"Huyện Phú Tân",ma_huyen_cu:"888"},{ma_moi:30421,ten_moi:"Xã Phú Lâm",ten_cu:"Xã Phú Lâm",ma_cu:"30421",huyen_cu:"Huyện Phú Tân",ma_huyen_cu:"888"},{ma_moi:30421,ten_moi:"Xã Phú Lâm",ten_cu:"Xã Phú Long",ma_cu:"30418",huyen_cu:"Huyện Phú Tân",ma_huyen_cu:"888"},{ma_moi:30463,ten_moi:"Xã Châu Phú",ten_cu:"Thị trấn Cái Dầu",ma_cu:"30463",huyen_cu:"Huyện Châu Phú",ma_huyen_cu:"889"},{ma_moi:30463,ten_moi:"Xã Châu Phú",ten_cu:"Xã Bình Long",ma_cu:"30484",huyen_cu:"Huyện Châu Phú",ma_huyen_cu:"889"},{ma_moi:30463,ten_moi:"Xã Châu Phú",ten_cu:"Xã Bình Phú",ma_cu:"30496",huyen_cu:"Huyện Châu Phú",ma_huyen_cu:"889"},{ma_moi:30469,ten_moi:"Xã Mỹ Đức",ten_cu:"Xã Mỹ Đức",ma_cu:"30469",huyen_cu:"Huyện Châu Phú",ma_huyen_cu:"889"},{ma_moi:30469,ten_moi:"Xã Mỹ Đức",ten_cu:"Xã Khánh Hòa",ma_cu:"30466",huyen_cu:"Huyện Châu Phú",ma_huyen_cu:"889"},{ma_moi:30478,ten_moi:"Xã Vĩnh Thạnh Trung",ten_cu:"Xã Mỹ Phú",ma_cu:"30472",huyen_cu:"Huyện Châu Phú",ma_huyen_cu:"889"},{ma_moi:30478,ten_moi:"Xã Vĩnh Thạnh Trung",ten_cu:"Thị trấn Vĩnh Thạnh Trung",ma_cu:"30478",huyen_cu:"Huyện Châu Phú",ma_huyen_cu:"889"},{ma_moi:30487,ten_moi:"Xã Bình Mỹ",ten_cu:"Xã Bình Mỹ",ma_cu:"30487",huyen_cu:"Huyện Châu Phú",ma_huyen_cu:"889"},{ma_moi:30487,ten_moi:"Xã Bình Mỹ",ten_cu:"Xã Bình Thủy",ma_cu:"30490",huyen_cu:"Huyện Châu Phú",ma_huyen_cu:"889"},{ma_moi:30487,ten_moi:"Xã Bình Mỹ",ten_cu:"Xã Bình Chánh",ma_cu:"30499",huyen_cu:"Huyện Châu Phú",ma_huyen_cu:"889"},{ma_moi:30481,ten_moi:"Xã Thạnh Mỹ Tây",ten_cu:"Xã Đào Hữu Cảnh",ma_cu:"30493",huyen_cu:"Huyện Châu Phú",ma_huyen_cu:"889"},{ma_moi:30481,ten_moi:"Xã Thạnh Mỹ Tây",ten_cu:"Xã Thạnh Mỹ Tây",ma_cu:"30481",huyen_cu:"Huyện Châu Phú",ma_huyen_cu:"889"},{ma_moi:30481,ten_moi:"Xã Thạnh Mỹ Tây",ten_cu:"Xã Ô Long Vĩ",ma_cu:"30475",huyen_cu:"Huyện Châu Phú",ma_huyen_cu:"889"},{ma_moi:30526,ten_moi:"Xã An Cư",ten_cu:"Xã An Cư",ma_cu:"30526",huyen_cu:"Thị xã Tịnh Biên",ma_huyen_cu:"890"},{ma_moi:30526,ten_moi:"Xã An Cư",ten_cu:"Xã Văn Giáo",ma_cu:"30523",huyen_cu:"Thị xã Tịnh Biên",ma_huyen_cu:"890"},{ma_moi:30526,ten_moi:"Xã An Cư",ten_cu:"Xã Vĩnh Trung",ma_cu:"30532",huyen_cu:"Thị xã Tịnh Biên",ma_huyen_cu:"890"},{ma_moi:30538,ten_moi:"Xã Núi Cấm",ten_cu:"Xã An Hảo",ma_cu:"30538",huyen_cu:"Thị xã Tịnh Biên",ma_huyen_cu:"890"},{ma_moi:30538,ten_moi:"Xã Núi Cấm",ten_cu:"Xã Tân Lập",ma_cu:"30541",huyen_cu:"Thị xã Tịnh Biên",ma_huyen_cu:"890"},{ma_moi:30520,ten_moi:"Phường Tịnh Biên",ten_cu:"Phường An Phú",ma_cu:"30514",huyen_cu:"Thị xã Tịnh Biên",ma_huyen_cu:"890"},{ma_moi:30520,ten_moi:"Phường Tịnh Biên",ten_cu:"Phường Tịnh Biên",ma_cu:"30520",huyen_cu:"Thị xã Tịnh Biên",ma_huyen_cu:"890"},{ma_moi:30520,ten_moi:"Phường Tịnh Biên",ten_cu:"Xã An Nông",ma_cu:"30529",huyen_cu:"Thị xã Tịnh Biên",ma_huyen_cu:"890"},{ma_moi:30502,ten_moi:"Phường Thới Sơn",ten_cu:"Phường Nhơn Hưng",ma_cu:"30511",huyen_cu:"Thị xã Tịnh Biên",ma_huyen_cu:"890"},{ma_moi:30502,ten_moi:"Phường Thới Sơn",ten_cu:"Phường Nhà Bàng",ma_cu:"30502",huyen_cu:"Thị xã Tịnh Biên",ma_huyen_cu:"890"},{ma_moi:30502,ten_moi:"Phường Thới Sơn",ten_cu:"Phường Thới Sơn",ma_cu:"30517",huyen_cu:"Thị xã Tịnh Biên",ma_huyen_cu:"890"},{ma_moi:30505,ten_moi:"Phường Chi Lăng",ten_cu:"Phường Chi Lăng",ma_cu:"30505",huyen_cu:"Thị xã Tịnh Biên",ma_huyen_cu:"890"},{ma_moi:30505,ten_moi:"Phường Chi Lăng",ten_cu:"Phường Núi Voi",ma_cu:"30508",huyen_cu:"Thị xã Tịnh Biên",ma_huyen_cu:"890"},{ma_moi:30505,ten_moi:"Phường Chi Lăng",ten_cu:"Xã Tân Lợi",ma_cu:"30535",huyen_cu:"Thị xã Tịnh Biên",ma_huyen_cu:"890"},{ma_moi:30547,ten_moi:"Xã Ba Chúc",ten_cu:"Thị trấn Ba Chúc",ma_cu:"30547",huyen_cu:"Huyện Tri Tôn",ma_huyen_cu:"891"},{ma_moi:30547,ten_moi:"Xã Ba Chúc",ten_cu:"Xã Lạc Quới",ma_cu:"30550",huyen_cu:"Huyện Tri Tôn",ma_huyen_cu:"891"},{ma_moi:30547,ten_moi:"Xã Ba Chúc",ten_cu:"Xã Lê Trì",ma_cu:"30553",huyen_cu:"Huyện Tri Tôn",ma_huyen_cu:"891"},{ma_moi:30544,ten_moi:"Xã Tri Tôn",ten_cu:"Xã Núi Tô",ma_cu:"30574",huyen_cu:"Huyện Tri Tôn",ma_huyen_cu:"891"},{ma_moi:30544,ten_moi:"Xã Tri Tôn",ten_cu:"Xã Châu Lăng",ma_cu:"30562",huyen_cu:"Huyện Tri Tôn",ma_huyen_cu:"891"},{ma_moi:30544,ten_moi:"Xã Tri Tôn",ten_cu:"Thị trấn Tri Tôn",ma_cu:"30544",huyen_cu:"Huyện Tri Tôn",ma_huyen_cu:"891"},{ma_moi:30577,ten_moi:"Xã Ô Lâm",ten_cu:"Xã Lương Phi",ma_cu:"30565",huyen_cu:"Huyện Tri Tôn",ma_huyen_cu:"891"},{ma_moi:30577,ten_moi:"Xã Ô Lâm",ten_cu:"Xã An Tức",ma_cu:"30577",huyen_cu:"Huyện Tri Tôn",ma_huyen_cu:"891"},{ma_moi:30577,ten_moi:"Xã Ô Lâm",ten_cu:"Xã Ô Lâm",ma_cu:"30586",huyen_cu:"Huyện Tri Tôn",ma_huyen_cu:"891"},{ma_moi:30580,ten_moi:"Xã Cô Tô",ten_cu:"Thị trấn Cô Tô",ma_cu:"30580",huyen_cu:"Huyện Tri Tôn",ma_huyen_cu:"891"},{ma_moi:30580,ten_moi:"Xã Cô Tô",ten_cu:"Xã Tà Đảnh",ma_cu:"30571",huyen_cu:"Huyện Tri Tôn",ma_huyen_cu:"891"},{ma_moi:30580,ten_moi:"Xã Cô Tô",ten_cu:"Xã Tân Tuyến",ma_cu:"30583",huyen_cu:"Huyện Tri Tôn",ma_huyen_cu:"891"},{ma_moi:30568,ten_moi:"Xã Vĩnh Gia",ten_cu:"Xã Vĩnh Gia",ma_cu:"30556",huyen_cu:"Huyện Tri Tôn",ma_huyen_cu:"891"},{ma_moi:30568,ten_moi:"Xã Vĩnh Gia",ten_cu:"Xã Vĩnh Phước",ma_cu:"30559",huyen_cu:"Huyện Tri Tôn",ma_huyen_cu:"891"},{ma_moi:30568,ten_moi:"Xã Vĩnh Gia",ten_cu:"Xã Lương An Trà",ma_cu:"30568",huyen_cu:"Huyện Tri Tôn",ma_huyen_cu:"891"},{ma_moi:30589,ten_moi:"Xã An Châu",ten_cu:"Thị trấn An Châu",ma_cu:"30589",huyen_cu:"Huyện Châu Thành",ma_huyen_cu:"892"},{ma_moi:30589,ten_moi:"Xã An Châu",ten_cu:"Xã Hòa Bình Thạnh",ma_cu:"30613",huyen_cu:"Huyện Châu Thành",ma_huyen_cu:"892"},{ma_moi:30589,ten_moi:"Xã An Châu",ten_cu:"Xã Vĩnh Thành",ma_cu:"30625",huyen_cu:"Huyện Châu Thành",ma_huyen_cu:"892"},{ma_moi:30607,ten_moi:"Xã Bình Hòa",ten_cu:"Xã Bình Hòa",ma_cu:"30607",huyen_cu:"Huyện Châu Thành",ma_huyen_cu:"892"},{ma_moi:30607,ten_moi:"Xã Bình Hòa",ten_cu:"Xã An Hòa",ma_cu:"30592",huyen_cu:"Huyện Châu Thành",ma_huyen_cu:"892"},{ma_moi:30607,ten_moi:"Xã Bình Hòa",ten_cu:"Xã Bình Thạnh",ma_cu:"30601",huyen_cu:"Huyện Châu Thành",ma_huyen_cu:"892"},{ma_moi:30595,ten_moi:"Xã Cần Đăng",ten_cu:"Xã Cần Đăng",ma_cu:"30595",huyen_cu:"Huyện Châu Thành",ma_huyen_cu:"892"},{ma_moi:30595,ten_moi:"Xã Cần Đăng",ten_cu:"Xã Vĩnh Lợi",ma_cu:"30616",huyen_cu:"Huyện Châu Thành",ma_huyen_cu:"892"},{ma_moi:30619,ten_moi:"Xã Vĩnh Hanh",ten_cu:"Xã Vĩnh Hanh",ma_cu:"30598",huyen_cu:"Huyện Châu Thành",ma_huyen_cu:"892"},{ma_moi:30619,ten_moi:"Xã Vĩnh Hanh",ten_cu:"Xã Vĩnh Nhuận",ma_cu:"30619",huyen_cu:"Huyện Châu Thành",ma_huyen_cu:"892"},{ma_moi:30604,ten_moi:"Xã Vĩnh An",ten_cu:"Thị trấn Vĩnh Bình",ma_cu:"30604",huyen_cu:"Huyện Châu Thành",ma_huyen_cu:"892"},{ma_moi:30604,ten_moi:"Xã Vĩnh An",ten_cu:"Xã Vĩnh An",ma_cu:"30610",huyen_cu:"Huyện Châu Thành",ma_huyen_cu:"892"},{ma_moi:30604,ten_moi:"Xã Vĩnh An",ten_cu:"Xã Tân Phú",ma_cu:"30622",huyen_cu:"Huyện Châu Thành",ma_huyen_cu:"892"},{ma_moi:30628,ten_moi:"Xã Chợ Mới",ten_cu:"Thị trấn Chợ Mới",ma_cu:"30628",huyen_cu:"Huyện Chợ Mới",ma_huyen_cu:"293"},{ma_moi:30628,ten_moi:"Xã Chợ Mới",ten_cu:"Xã Kiến An",ma_cu:"30634",huyen_cu:"Huyện Chợ Mới",ma_huyen_cu:"293"},{ma_moi:30628,ten_moi:"Xã Chợ Mới",ten_cu:"Xã Kiến Thành",ma_cu:"30649",huyen_cu:"Huyện Chợ Mới",ma_huyen_cu:"293"},{ma_moi:30643,ten_moi:"Xã Cù Lao Giêng",ten_cu:"Xã Tấn Mỹ",ma_cu:"30643",huyen_cu:"Huyện Chợ Mới",ma_huyen_cu:"293"},{ma_moi:30643,ten_moi:"Xã Cù Lao Giêng",ten_cu:"Xã Mỹ Hiệp",ma_cu:"30652",huyen_cu:"Huyện Chợ Mới",ma_huyen_cu:"293"},{ma_moi:30643,ten_moi:"Xã Cù Lao Giêng",ten_cu:"Xã Bình Phước Xuân",ma_cu:"30667",huyen_cu:"Huyện Chợ Mới",ma_huyen_cu:"293"},{ma_moi:30673,ten_moi:"Xã Hội An",ten_cu:"Thị trấn Hội An",ma_cu:"30673",huyen_cu:"Huyện Chợ Mới",ma_huyen_cu:"293"},{ma_moi:30673,ten_moi:"Xã Hội An",ten_cu:"Xã Hòa Bình",ma_cu:"30676",huyen_cu:"Huyện Chợ Mới",ma_huyen_cu:"293"},{ma_moi:30673,ten_moi:"Xã Hội An",ten_cu:"Xã Hòa An",ma_cu:"30679",huyen_cu:"Huyện Chợ Mới",ma_huyen_cu:"293"},{ma_moi:30631,ten_moi:"Xã Long Điền",ten_cu:"Thị trấn Mỹ Luông",ma_cu:"30631",huyen_cu:"Huyện Chợ Mới",ma_huyen_cu:"293"},{ma_moi:30631,ten_moi:"Xã Long Điền",ten_cu:"Xã Long Điền A",ma_cu:"30640",huyen_cu:"Huyện Chợ Mới",ma_huyen_cu:"293"},{ma_moi:30631,ten_moi:"Xã Long Điền",ten_cu:"Xã Long Điền B",ma_cu:"30646",huyen_cu:"Huyện Chợ Mới",ma_huyen_cu:"293"},{ma_moi:30658,ten_moi:"Xã Nhơn Mỹ",ten_cu:"Xã Nhơn Mỹ",ma_cu:"30658",huyen_cu:"Huyện Chợ Mới",ma_huyen_cu:"293"},{ma_moi:30658,ten_moi:"Xã Nhơn Mỹ",ten_cu:"Xã Mỹ Hội Đông",ma_cu:"30637",huyen_cu:"Huyện Chợ Mới",ma_huyen_cu:"293"},{ma_moi:30658,ten_moi:"Xã Nhơn Mỹ",ten_cu:"Xã Long Giang",ma_cu:"30661",huyen_cu:"Huyện Chợ Mới",ma_huyen_cu:"293"},{ma_moi:30664,ten_moi:"Xã Long Kiến",ten_cu:"Xã An Thạnh Trung",ma_cu:"30670",huyen_cu:"Huyện Chợ Mới",ma_huyen_cu:"293"},{ma_moi:30664,ten_moi:"Xã Long Kiến",ten_cu:"Xã Long Kiến",ma_cu:"30664",huyen_cu:"Huyện Chợ Mới",ma_huyen_cu:"293"},{ma_moi:30664,ten_moi:"Xã Long Kiến",ten_cu:"Xã Mỹ An",ma_cu:"30655",huyen_cu:"Huyện Chợ Mới",ma_huyen_cu:"293"},{ma_moi:30682,ten_moi:"Xã Thoại Sơn",ten_cu:"Xã Thoại Giang",ma_cu:"30721",huyen_cu:"Huyện Thoại Sơn",ma_huyen_cu:"894"},{ma_moi:30682,ten_moi:"Xã Thoại Sơn",ten_cu:"Xã Bình Thành",ma_cu:"30724",huyen_cu:"Huyện Thoại Sơn",ma_huyen_cu:"894"},{ma_moi:30682,ten_moi:"Xã Thoại Sơn",ten_cu:"Thị trấn Núi Sập",ma_cu:"30682",huyen_cu:"Huyện Thoại Sơn",ma_huyen_cu:"894"},{ma_moi:30688,ten_moi:"Xã Óc Eo",ten_cu:"Xã Vọng Thê",ma_cu:"30727",huyen_cu:"Huyện Thoại Sơn",ma_huyen_cu:"894"},{ma_moi:30688,ten_moi:"Xã Óc Eo",ten_cu:"Xã Vọng Đông",ma_cu:"30715",huyen_cu:"Huyện Thoại Sơn",ma_huyen_cu:"894"},{ma_moi:30688,ten_moi:"Xã Óc Eo",ten_cu:"Thị trấn Óc Eo",ma_cu:"30688",huyen_cu:"Huyện Thoại Sơn",ma_huyen_cu:"894"},{ma_moi:30709,ten_moi:"Xã Định Mỹ",ten_cu:"Xã Định Thành",ma_cu:"30709",huyen_cu:"Huyện Thoại Sơn",ma_huyen_cu:"894"},{ma_moi:30709,ten_moi:"Xã Định Mỹ",ten_cu:"Xã Định Mỹ",ma_cu:"30706",huyen_cu:"Huyện Thoại Sơn",ma_huyen_cu:"894"},{ma_moi:30709,ten_moi:"Xã Định Mỹ",ten_cu:"Xã Vĩnh Phú",ma_cu:"30694",huyen_cu:"Huyện Thoại Sơn",ma_huyen_cu:"894"},{ma_moi:30685,ten_moi:"Xã Phú Hòa",ten_cu:"Xã Phú Thuận",ma_cu:"30700",huyen_cu:"Huyện Thoại Sơn",ma_huyen_cu:"894"},{ma_moi:30685,ten_moi:"Xã Phú Hòa",ten_cu:"Xã Vĩnh Chánh",ma_cu:"30703",huyen_cu:"Huyện Thoại Sơn",ma_huyen_cu:"894"},{ma_moi:30685,ten_moi:"Xã Phú Hòa",ten_cu:"Thị trấn Phú Hòa",ma_cu:"30685",huyen_cu:"Huyện Thoại Sơn",ma_huyen_cu:"894"},{ma_moi:30697,ten_moi:"Xã Vĩnh Trạch",ten_cu:"Xã Vĩnh Khánh",ma_cu:"30718",huyen_cu:"Huyện Thoại Sơn",ma_huyen_cu:"894"},{ma_moi:30697,ten_moi:"Xã Vĩnh Trạch",ten_cu:"Xã Vĩnh Trạch",ma_cu:"30697",huyen_cu:"Huyện Thoại Sơn",ma_huyen_cu:"894"},{ma_moi:30691,ten_moi:"Xã Tây Phú",ten_cu:"Xã An Bình",ma_cu:"30692",huyen_cu:"Huyện Thoại Sơn",ma_huyen_cu:"894"},{ma_moi:30691,ten_moi:"Xã Tây Phú",ten_cu:"Xã Tây Phú",ma_cu:"30691",huyen_cu:"Huyện Thoại Sơn",ma_huyen_cu:"894"},{ma_moi:30691,ten_moi:"Xã Tây Phú",ten_cu:"Xã Mỹ Phú Đông",ma_cu:"30712",huyen_cu:"Huyện Thoại Sơn",ma_huyen_cu:"894"}];function normalize(n){return(n||"").toString().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/đ/gi,n=>"đ"===n?"d":"D").toLowerCase().replace(/^(xã|phường|thị trấn|đặc khu|thành phố|huyện|quận|thị xã)\s+/,"").trim()}const newGroups={};RAW_DATA.forEach(n=>{newGroups[n.ma_moi]||(newGroups[n.ma_moi]={ma_moi:n.ma_moi,ten_moi:n.ten_moi,items:[]}),newGroups[n.ma_moi].items.push(n)}),document.getElementById("scopeCount").textContent=RAW_DATA.length,document.getElementById("scopeNew").textContent=Object.keys(newGroups).length;let mode="old2new";const searchBox=document.getElementById("searchBox"),suggestionsEl=document.getElementById("suggestions"),resultsEl=document.getElementById("results"),clearBtn=document.getElementById("clearBtn"),hintText=document.getElementById("hintText");let hiIndex=-1;function showEmpty(){resultsEl.innerHTML='<div class="empty-state"><span class="glyph">Hướng dẫn</span>Nhập tên xã/phường ở ô tìm kiếm phía trên để xem kết quả đối chiếu.</div>'}function getSuggestions(n){const u=normalize(n);if(!u)return[];if("old2new"===mode)return RAW_DATA.filter(n=>normalize(n.ten_cu).includes(u)).slice(0,8);return Object.values(newGroups).filter(n=>normalize(n.ten_moi).includes(u)).slice(0,8)}function renderSuggestions(n){if(hiIndex=-1,0===n.length)return suggestionsEl.classList.remove("show"),void(suggestionsEl.innerHTML="");suggestionsEl.innerHTML=n.map((n,u)=>"old2new"===mode?`<div class="sugg-item" data-idx="${u}"><span>${n.ten_cu}</span><span class="meta">${n.huyen_cu}</span></div>`:`<div class="sugg-item" data-idx="${u}"><span>${n.ten_moi}</span><span class="meta">${n.items.length} xã/phường cũ</span></div>`).join(""),suggestionsEl.classList.add("show"),[...suggestionsEl.children].forEach((u,_)=>{u.addEventListener("click",()=>{selectSuggestion(n[_])})})}function selectSuggestion(n){"old2new"===mode?(searchBox.value=n.ten_cu,renderOldToNew(n)):(searchBox.value=n.ten_moi,renderNewToOld(n)),suggestionsEl.classList.remove("show"),clearBtn.classList.add("show")}function renderOldToNew(n){resultsEl.innerHTML=`\n    <div class="result-card">\n      <div class="rc-label">Xã / phường cũ</div>\n      <div class="rc-old">${n.ten_cu} — thuộc ${n.huyen_cu}</div>\n      <div class="divider-arrow"><span class="line"></span><span>↓ nay là</span><span class="line"></span></div>\n      <div class="rc-label">Đơn vị hành chính mới</div>\n      <div class="rc-new">${n.ten_moi}</div>\n      <div class="meta-grid">\n        <div class="meta-item"><div class="k">Mã ĐVHC mới</div><div class="v">${n.ma_moi}</div></div>\n        <div class="meta-item"><div class="k">Mã xã cũ</div><div class="v">${n.ma_cu}</div></div>\n        <div class="meta-item"><div class="k">Mã huyện cũ</div><div class="v">${n.ma_huyen_cu}</div></div>\n      </div>\n    </div>`}function renderNewToOld(n){const u=n.items.map(n=>`<li><span>${n.ten_cu}</span><span class="code">${n.ma_cu}</span></li>`).join("");resultsEl.innerHTML=`\n    <div class="result-card">\n      <div class="rc-label">Đơn vị hành chính mới</div>\n      <div class="rc-new" style="margin-bottom:4px;">${n.ten_moi}<span class="count-badge">${n.items.length} xã/phường cũ</span></div>\n      <div class="rc-label" style="margin-top:14px;">Mã ĐVHC mới: <span style="color:var(--ink);font-family:'Space Mono',monospace;">${n.ma_moi}</span></div>\n      <div class="divider-arrow"><span class="line"></span><span>gồm các xã/phường cũ</span><span class="line"></span></div>\n      <ul class="group-list">${u}</ul>\n    </div>`}function updateHi(n){n.forEach((n,u)=>n.classList.toggle("hi",u===hiIndex)),n[hiIndex]&&n[hiIndex].scrollIntoView({block:"nearest"})}document.querySelectorAll(".tab").forEach(n=>{n.addEventListener("click",()=>{document.querySelectorAll(".tab").forEach(n=>n.classList.remove("active")),n.classList.add("active"),mode=n.dataset.mode,searchBox.value="",clearBtn.classList.remove("show"),hintText.textContent="old2new"===mode?'Không cần gõ dấu hay chữ hoa — nhập "duong dong" cũng tìm được "Dương Đông".':'Nhập tên đơn vị mới (ví dụ "Phú Quốc") để xem toàn bộ các xã/phường cũ đã sáp nhập.',searchBox.placeholder="old2new"===mode?"Ví dụ: Dương Đông, Cửa Cạn, Hòn Tre…":"Ví dụ: Đặc khu Phú Quốc, Kiên Hải…",showEmpty(),suggestionsEl.classList.remove("show"),searchBox.focus()})}),searchBox.addEventListener("input",()=>{const n=searchBox.value;clearBtn.classList.toggle("show",n.length>0);renderSuggestions(getSuggestions(n)),""===n.trim()&&showEmpty()}),searchBox.addEventListener("keydown",n=>{const u=[...suggestionsEl.children];if(suggestionsEl.classList.contains("show")&&0!==u.length)if("ArrowDown"===n.key)n.preventDefault(),hiIndex=Math.min(hiIndex+1,u.length-1),updateHi(u);else if("ArrowUp"===n.key)n.preventDefault(),hiIndex=Math.max(hiIndex-1,0),updateHi(u);else if("Enter"===n.key){n.preventDefault();const u=getSuggestions(searchBox.value),_=hiIndex>=0?u[hiIndex]:u[0];_&&selectSuggestion(_)}else"Escape"===n.key&&suggestionsEl.classList.remove("show")}),clearBtn.addEventListener("click",()=>{searchBox.value="",clearBtn.classList.remove("show"),suggestionsEl.classList.remove("show"),showEmpty(),searchBox.focus()}),document.addEventListener("click",n=>{n.target.closest(".search-shell")||n.target.closest(".suggestions")||suggestionsEl.classList.remove("show")});</script>
+</body>
+</html>
